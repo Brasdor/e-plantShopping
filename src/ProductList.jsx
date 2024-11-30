@@ -3,8 +3,8 @@ import './ProductList.css'
 import CartItem from './CartItem';
 function ProductList() {
     const [showCart, setShowCart] = useState(false); 
-    const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
-
+    const [showPlants, setShowPlants] = useState(true); // State to control the visibility of the About Us page
+    const [addedToCart, setAddedToCart] = useState([]); // To track which plants have been added to the cart
     const plantsArray = [
         {
             category: "Air Purifying Plants",
@@ -235,17 +235,26 @@ function ProductList() {
    const handleCartClick = (e) => {
     e.preventDefault();
     setShowCart(true); // Set showCart to true when cart icon is clicked
+    setShowPlants(false);
 };
 const handlePlantsClick = (e) => {
     e.preventDefault();
     setShowPlants(true); // Set showAboutUs to true when "About Us" link is clicked
     setShowCart(false); // Hide the cart when navigating to About Us
 };
-
+const handleAddToCart = (plant) => {
+    setAddedToCart((prevCart) => [...prevCart, plant]);
+    console.log(`${plant.name} added to cart!`); // Confirm item is added to cart in the console
+  };
    const handleContinueShopping = (e) => {
     e.preventDefault();
     setShowCart(false);
+    setShowPlants(true);
   };
+  useEffect(() => {
+    console.log('Cart updated:', addedToCart);
+  }, [addedToCart]); // Monitor changes in the cart
+
     return (
         <div>
              <div className="navbar" style={styleObj}>
@@ -268,9 +277,29 @@ const handlePlantsClick = (e) => {
         </div>
         {!showCart? (
         <div className="product-grid">
-
-
-        </div>
+        {plantsArray.map((category) => (
+          <div key={category.category}>
+            <h2>{category.category}</h2>
+            <div className="plants">
+              {category.plants.map((plant) => (
+                <div key={plant.name} className="product-card">
+                  <img src={plant.image} alt={plant.name} />
+                  <h3>{plant.name}</h3>
+                  <p>{plant.description}</p>
+                  <p>Cost: {plant.cost}</p>
+                  <button
+                    className="add-to-cart-button"
+                    onClick={() => handleAddToCart(plant)}
+                  >
+                    Add to Cart
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      
  ) :  (
     <CartItem onContinueShopping={handleContinueShopping}/>
 )}
